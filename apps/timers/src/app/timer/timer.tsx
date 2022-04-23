@@ -79,10 +79,10 @@ export function Timer({ name, onDelete }: TimerProps) {
   )}:${prefixZero(duration.seconds)}`;
 
   return (
-    <div>
-      <h2>{name}</h2>
+    <div className="flex flex-col items-center gap-2">
+      <h2 className="font-bold text-3xl">{name}</h2>
       <span>{durationStr}</span>
-      <div>
+      <div className="flex flex-row gap-1">
         {!paused && (
           <button aria-label="pause" onClick={() => updatePaused(true)}>
             <IoMdPause />

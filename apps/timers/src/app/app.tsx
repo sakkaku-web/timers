@@ -37,10 +37,11 @@ export function App() {
   ));
 
   return (
-    <div>
+    <div className="flex flex-col items-center gap-4 text-slate-900">
       {timerComponents}
-      <div>
+      <div className="flex flex-row gap-1">
         <input
+          className="ring-1 ring-slate-900/30 hover:ring-slate-500 rounded outline-0"
           type="text"
           value={newTimerName}
           onChange={(e) => setNewTimerName(e.target.value)}

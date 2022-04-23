@@ -1,3 +1,17 @@
 @tailwind components;
 @tailwind base;
 @tailwind utilities;
+
+body {
+  font-size: 18px;
+  padding: 1rem;
+}
+
+button:disabled {
+  @apply text-slate-900/30;
+}
+
+button, input {
+  @apply py-1;
+  @apply px-2;
+}
