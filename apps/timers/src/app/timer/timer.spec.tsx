@@ -52,4 +52,18 @@ describe('Timer', () => {
     act(() => tick(20));
     expect(baseElement.textContent).toContain('01:00:22');
   });
+
+  it('should pause and resume timer', () => {
+    const { baseElement, getByRole } = render(
+      <Timer start={new Date('2020-01-01T10:00:00')} name="Drawing" />
+    );
+
+    act(() => {
+      getByRole('button', { name: /pause/i }).click();
+      // tick();
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(baseElement.textContent).toContain('01:00:00');
+  });
 });
