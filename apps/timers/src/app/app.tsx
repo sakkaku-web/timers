@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoMdAdd } from 'react-icons/io';
 
 import { Timer } from './timer/timer';
@@ -27,6 +27,12 @@ export function App() {
     setTimers(timers.filter((timer) => timer !== name));
   };
 
+  const addOnEnter = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      addTimer();
+    }
+  };
+
   useEffect(
     () => localStorage.setItem(TIMERS_KEY, JSON.stringify(timers)),
     [timers]
@@ -41,10 +47,11 @@ export function App() {
       {timerComponents}
       <div className="flex flex-row gap-1">
         <input
-          className="ring-1 ring-slate-900/30 hover:ring-slate-500 rounded outline-0"
+          className="ring-1 ring-slate-900/10 hover:ring-slate-300 rounded outline-0"
           type="text"
           value={newTimerName}
           onChange={(e) => setNewTimerName(e.target.value)}
+          onKeyPress={addOnEnter}
         />
         <button
           aria-label="add timer"
