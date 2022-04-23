@@ -23,6 +23,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/timers/",
               "fileReplacements": [
                 {
                   "replace": "apps/timers/src/environments/environment.ts",
