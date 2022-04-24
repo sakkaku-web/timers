@@ -49,6 +49,7 @@ export function App() {
         <input
           className="ring-1 ring-slate-900/10 hover:ring-slate-300 rounded outline-0"
           type="text"
+          placeholder="Name"
           value={newTimerName}
           onChange={(e) => setNewTimerName(e.target.value)}
           onKeyPress={addOnEnter}
