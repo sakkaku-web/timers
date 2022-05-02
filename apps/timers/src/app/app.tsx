@@ -18,7 +18,10 @@ export function App() {
   const [newTimerName, setNewTimerName] = useState('');
   const [timers, setTimers] = useState(loadSavedTimers());
 
+  const isCreateDisabled = !newTimerName || timers.includes(newTimerName);
   const addTimer = () => {
+    if (isCreateDisabled) return;
+
     setTimers([...timers, newTimerName]);
     setNewTimerName('');
   };
@@ -56,7 +59,7 @@ export function App() {
         />
         <button
           aria-label="add timer"
-          disabled={!newTimerName || timers.includes(newTimerName)}
+          disabled={isCreateDisabled}
           onClick={() => addTimer()}
         >
           <IoMdAdd />
