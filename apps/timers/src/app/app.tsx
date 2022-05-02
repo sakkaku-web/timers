@@ -50,7 +50,7 @@ export function App() {
       {timerComponents}
       <div className="flex flex-row gap-1">
         <input
-          className="rounded outline-0 ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900"
+          className="rounded outline-0 ring-inset ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900"
           type="text"
           placeholder="Name"
           value={newTimerName}
