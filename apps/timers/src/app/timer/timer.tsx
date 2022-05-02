@@ -112,7 +112,7 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <h2 className="font-bold text-3xl flex flex-col">
+      <h2 className="font-bold text-3xl flex flex-col items-center">
         {name}
         {startTime && (
           <span className="text-xs text-slate-500 dark:text-slate-300">
