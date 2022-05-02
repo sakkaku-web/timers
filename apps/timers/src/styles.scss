@@ -4,11 +4,12 @@
 
 body {
   font-size: 18px;
-  padding: 1rem;
 }
 
-button:disabled {
-  @apply text-slate-900/10;
+html, body, #root {
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 button, input {

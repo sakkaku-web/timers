@@ -108,7 +108,7 @@ export function Timer({ name, onDelete }: TimerProps) {
       <h2 className="font-bold text-3xl flex flex-col">
         {name}
         {startTime && (
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-slate-500 dark:text-slate-300">
             {format(startTime, 'dd.MM.yyyy')}
           </span>
         )}

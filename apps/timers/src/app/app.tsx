@@ -46,11 +46,11 @@ export function App() {
   ));
 
   return (
-    <div className="flex flex-col items-center gap-4 text-slate-900">
+    <div className="h-full flex flex-col items-center gap-4 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
       {timerComponents}
       <div className="flex flex-row gap-1">
         <input
-          className="ring-1 ring-slate-900/10 hover:ring-slate-300 rounded outline-0"
+          className="rounded outline-0 ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900"
           type="text"
           placeholder="Name"
           value={newTimerName}
@@ -59,6 +59,7 @@ export function App() {
         />
         <button
           aria-label="add timer"
+          className="disabled:text-slate-200 dark:disabled:text-slate-700"
           disabled={isCreateDisabled}
           onClick={() => addTimer()}
         >
