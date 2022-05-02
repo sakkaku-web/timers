@@ -41,14 +41,17 @@ export function Timer({ name, onDelete }: TimerProps) {
   const [timeInSec, setTimeInSec] = useState(loadSavedTime());
   const [startTime, setStartTime] = useState(loadStartTime());
 
-  const updateStartTime = (time: Date | null) => {
-    setStartTime(time);
-    if (time) {
-      localStorage.setItem(startTimeKey, time.toISOString());
-    } else {
-      localStorage.removeItem(startTimeKey);
-    }
-  };
+  const updateStartTime = useCallback(
+    (time: Date | null) => {
+      setStartTime(time);
+      if (time) {
+        localStorage.setItem(startTimeKey, time.toISOString());
+      } else {
+        localStorage.removeItem(startTimeKey);
+      }
+    },
+    [startTimeKey]
+  );
 
   const updatePaused = (paused: boolean) => {
     setPaused(paused);
@@ -71,6 +74,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   const deleteTimer = () => {
     onDelete(name);
     localStorage.removeItem(saveKey);
+    localStorage.removeItem(startTimeKey);
   };
 
   useEffect(() => saveTime(), [saveTime]);
@@ -84,9 +88,6 @@ export function Timer({ name, onDelete }: TimerProps) {
     };
 
     if (!paused) {
-      if (timeInSec === 0) {
-        updateStartTime(new Date());
-      }
       interval = setInterval(() => increaseTime(), 1000);
     } else {
       clear();
@@ -94,6 +95,12 @@ export function Timer({ name, onDelete }: TimerProps) {
 
     return () => clear();
   }, [paused]);
+
+  useEffect(() => {
+    if (!paused && timeInSec === 0) {
+      updateStartTime(new Date());
+    }
+  }, [paused, timeInSec, updateStartTime]);
 
   const start = new Date(0);
   const end = add(start, { seconds: timeInSec });
