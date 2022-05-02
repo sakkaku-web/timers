@@ -1,4 +1,4 @@
-import { Duration } from 'date-fns';
+import { add, Duration, intervalToDuration } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import { IoMdPause, IoMdPlay, IoMdRefresh, IoMdTrash } from 'react-icons/io';
 import './timer.module.scss';
@@ -73,7 +73,10 @@ export function Timer({ name, onDelete }: TimerProps) {
     return () => clear();
   }, [paused]);
 
-  const duration: Duration = { seconds: timeInSec };
+  const start = new Date(0);
+  const end = add(start, { seconds: timeInSec });
+
+  const duration: Duration = intervalToDuration({ start, end });
   const durationStr = `${prefixZero(duration.hours)}:${prefixZero(
     duration.minutes
   )}:${prefixZero(duration.seconds)}`;
