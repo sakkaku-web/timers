@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IoMdAdd } from 'react-icons/io';
+import TextInput from './text-input/text-input';
 
 import { Timer } from './timer/timer';
 
@@ -30,12 +31,6 @@ export function App() {
     setTimers(timers.filter((timer) => timer !== name));
   };
 
-  const addOnEnter = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      addTimer();
-    }
-  };
-
   useEffect(
     () => localStorage.setItem(TIMERS_KEY, JSON.stringify(timers)),
     [timers]
@@ -49,13 +44,11 @@ export function App() {
     <div className="h-full flex flex-col items-center gap-4 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
       {timerComponents}
       <div className="flex flex-row gap-1">
-        <input
-          className="rounded outline-0 ring-inset ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900"
-          type="text"
+        <TextInput
           placeholder="Name"
           value={newTimerName}
-          onChange={(e) => setNewTimerName(e.target.value)}
-          onKeyPress={addOnEnter}
+          onChange={setNewTimerName}
+          onEnter={addTimer}
         />
         <button
           aria-label="add timer"
