@@ -1,5 +1,5 @@
 import { format, isValid } from 'date-fns';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   IoMdFlag,
   IoMdPause,
@@ -20,6 +20,9 @@ export interface TimerProps {
 const TIMER_KEY_PREFIX = 'sakkaku-web-timers-timer-';
 const TIMER_START_KEY_PREFIX = 'sakkaku-web-timers-timerStart-';
 const TIMER_LAPS_KEY_PREFIX = 'sakkaku-web-timers-timerLaps-';
+
+// TODO: make configurable
+const POMODORO_MINUTES = 25;
 
 export function Timer({ name, onDelete }: TimerProps) {
   const saveKey = TIMER_KEY_PREFIX + name;
@@ -47,11 +50,17 @@ export function Timer({ name, onDelete }: TimerProps) {
   const [timerLaps, setTimerLaps] = useState(loadLaps());
   const [pomodoroStart, setPomodoroStart] = useState(null as number | null);
 
+  const soundRef = useRef<HTMLAudioElement>(null);
+
+  const pause = () => setPaused(true);
+  const play = () => setPaused(false);
+  const resetPomodoroTime = () => setPomodoroStart(null);
+
   const resetTime = () => {
-    setPaused(true);
+    pause();
     setTimeInSec(0);
     setTimerLaps([]);
-    setPomodoroStart(null);
+    resetPomodoroTime();
     updateStartTime(null);
   };
 
@@ -64,11 +73,11 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   const togglePomodoroTimer = () => {
     if (pomodoroStart == null) {
-      setPaused(false);
+      play();
       setPomodoroStart(timeInSec);
     } else {
-      setPaused(true);
-      setPomodoroStart(null);
+      pause();
+      resetPomodoroTime();
     }
   };
 
@@ -84,14 +93,28 @@ export function Timer({ name, onDelete }: TimerProps) {
     localStorage.setItem(lapsKey, JSON.stringify(timerLaps || []));
   }, [lapsKey, timerLaps]);
 
-  const saveTime = useCallback(() => {
+  useEffect(() => {
     localStorage.setItem(saveKey, `${timeInSec}`);
   }, [saveKey, timeInSec]);
-  useEffect(() => saveTime(), [saveTime]);
 
-  const increaseTime = () => {
-    setTimeInSec((t) => t + 1);
+  const sendNotifiation = async (msg: string) => {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      new Notification(msg);
+      soundRef.current?.play();
+    }
   };
+  useEffect(() => {
+    if (pomodoroStart) {
+      const elapsedPomodoroMinutes = (timeInSec - pomodoroStart) / 60;
+      if (elapsedPomodoroMinutes >= POMODORO_MINUTES) {
+        sendNotifiation('Take a break!');
+        pause();
+        resetPomodoroTime();
+      }
+    }
+  }, [timeInSec, pomodoroStart]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     const clear = () => {
@@ -101,7 +124,7 @@ export function Timer({ name, onDelete }: TimerProps) {
     };
 
     if (!paused) {
-      interval = setInterval(() => increaseTime(), 1000);
+      interval = setInterval(() => setTimeInSec((t) => t + 1), 1000);
     } else {
       clear();
     }
@@ -128,6 +151,7 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   return (
     <div className="flex flex-col items-center gap-2">
+      <audio ref={soundRef} src="/assets/notification.wav" />
       <h2 className="font-bold text-3xl flex flex-col items-center">
         {name}
         {startTime && (
