@@ -57,9 +57,14 @@ export function Timer({ name, onDelete }: TimerProps) {
     seconds + minutes * 60 + hours * 60 * 60 + days * 24 * 60 * 60;
 
   const resetPomodoroTime = () => setPomodoroStart(null);
+  const stopPomodoro = () => {
+    pause();
+    resetPomodoroTime();
+  };
 
   const resetTime = () => {
     reset();
+    pause();
     setTimerLaps([]);
     resetPomodoroTime();
     updateStartTime(null);
@@ -74,11 +79,12 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   const togglePomodoroTimer = () => {
     if (pomodoroStart == null) {
-      start();
       setPomodoroStart(timeInSec);
+      if (!isRunning) {
+        start();
+      }
     } else {
-      pause();
-      resetPomodoroTime();
+      stopPomodoro();
     }
   };
 
@@ -112,8 +118,7 @@ export function Timer({ name, onDelete }: TimerProps) {
       const elapsedPomodoroMinutes = (timeInSec - pomodoroStart) / 60;
       if (elapsedPomodoroMinutes >= POMODORO_MINUTES) {
         sendNotifiation('Take a break!');
-        pause();
-        resetPomodoroTime();
+        stopPomodoro();
       }
     }
   }, [timeInSec, pomodoroStart, pause]);
