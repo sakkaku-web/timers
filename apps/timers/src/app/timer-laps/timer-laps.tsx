@@ -30,7 +30,7 @@ export function TimerLaps({ laps, onChange }: TimerLapsProps) {
   const updateLapName = () => {
     if (editIndex != null) {
       laps[editIndex].name = editName;
-      onChange(laps);
+      onChange([...laps]);
       setEditIndex(null);
     }
   };
