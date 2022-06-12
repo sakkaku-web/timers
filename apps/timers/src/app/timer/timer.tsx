@@ -1,4 +1,4 @@
-import { format, isValid } from 'date-fns';
+import { add, format, isValid } from 'date-fns';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   IoMdFlag,
@@ -11,6 +11,7 @@ import { GiTomato } from 'react-icons/gi';
 import TimerLaps, { TimerLap } from '../timer-laps/timer-laps';
 import { timeStr } from '../utils';
 import './timer.module.scss';
+import { useStopwatch } from 'react-timer-hook';
 
 export interface TimerProps {
   name: string;
@@ -29,9 +30,9 @@ export function Timer({ name, onDelete }: TimerProps) {
   const startTimeKey = TIMER_START_KEY_PREFIX + name;
   const lapsKey = TIMER_LAPS_KEY_PREFIX + name;
 
-  const loadSavedTime = (): number => {
+  const loadSavedTime = (): Date => {
     const time = parseInt(localStorage.getItem(saveKey) || '0');
-    return isNaN(time) ? 0 : time;
+    return isNaN(time) ? new Date() : add(new Date(), { seconds: time });
   };
 
   const loadStartTime = (): Date | null => {
@@ -44,21 +45,21 @@ export function Timer({ name, onDelete }: TimerProps) {
     return laps;
   };
 
-  const [paused, setPaused] = useState(true);
-  const [timeInSec, setTimeInSec] = useState(loadSavedTime());
   const [startTime, setStartTime] = useState(loadStartTime());
   const [timerLaps, setTimerLaps] = useState(loadLaps());
   const [pomodoroStart, setPomodoroStart] = useState(null as number | null);
 
   const soundRef = useRef<HTMLAudioElement>(null);
 
-  const pause = () => setPaused(true);
-  const play = () => setPaused(false);
+  const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
+    useStopwatch({ offsetTimestamp: loadSavedTime() });
+  const timeInSec =
+    seconds + minutes * 60 + hours * 60 * 60 + days * 24 * 60 * 60;
+
   const resetPomodoroTime = () => setPomodoroStart(null);
 
   const resetTime = () => {
-    pause();
-    setTimeInSec(0);
+    reset();
     setTimerLaps([]);
     resetPomodoroTime();
     updateStartTime(null);
@@ -73,7 +74,7 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   const togglePomodoroTimer = () => {
     if (pomodoroStart == null) {
-      play();
+      start();
       setPomodoroStart(timeInSec);
     } else {
       pause();
@@ -89,13 +90,15 @@ export function Timer({ name, onDelete }: TimerProps) {
     setTimerLaps(laps);
   };
 
-  useEffect(() => {
-    localStorage.setItem(lapsKey, JSON.stringify(timerLaps || []));
-  }, [lapsKey, timerLaps]);
+  useEffect(
+    () => localStorage.setItem(lapsKey, JSON.stringify(timerLaps || [])),
+    [lapsKey, timerLaps]
+  );
 
-  useEffect(() => {
-    localStorage.setItem(saveKey, `${timeInSec}`);
-  }, [saveKey, timeInSec]);
+  useEffect(
+    () => localStorage.setItem(saveKey, `${timeInSec}`),
+    [saveKey, timeInSec]
+  );
 
   const sendNotifiation = async (msg: string) => {
     const permission = await Notification.requestPermission();
@@ -113,24 +116,7 @@ export function Timer({ name, onDelete }: TimerProps) {
         resetPomodoroTime();
       }
     }
-  }, [timeInSec, pomodoroStart]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    const clear = () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-
-    if (!paused) {
-      interval = setInterval(() => setTimeInSec((t) => t + 1), 1000);
-    } else {
-      clear();
-    }
-
-    return () => clear();
-  }, [paused]);
+  }, [timeInSec, pomodoroStart, pause]);
 
   const updateStartTime = useCallback(
     (time: Date | null) => {
@@ -144,10 +130,10 @@ export function Timer({ name, onDelete }: TimerProps) {
     [startTimeKey]
   );
   useEffect(() => {
-    if (!paused && timeInSec === 0) {
+    if (isRunning && timeInSec === 0) {
       updateStartTime(new Date());
     }
-  }, [paused, timeInSec, updateStartTime]);
+  }, [isRunning, timeInSec, updateStartTime]);
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -165,14 +151,14 @@ export function Timer({ name, onDelete }: TimerProps) {
         <TimerLaps laps={timerLaps} onChange={saveLaps} />
       </div>
       <div className="flex flex-row gap-1">
-        {!paused && (
-          <button aria-label="pause" onClick={() => setPaused(true)}>
+        {isRunning && (
+          <button aria-label="pause" onClick={() => pause()}>
             <IoMdPause />
           </button>
         )}
 
-        {paused && (
-          <button aria-label="play" onClick={() => setPaused(false)}>
+        {!isRunning && (
+          <button aria-label="play" onClick={() => start()}>
             <IoMdPlay />
           </button>
         )}
