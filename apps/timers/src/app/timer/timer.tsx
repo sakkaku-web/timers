@@ -7,6 +7,7 @@ import {
   IoMdRefresh,
   IoMdTrash,
 } from 'react-icons/io';
+import { GiTomato } from 'react-icons/gi';
 import TimerLaps, { TimerLap } from '../timer-laps/timer-laps';
 import { timeStr } from '../utils';
 import './timer.module.scss';
@@ -44,11 +45,13 @@ export function Timer({ name, onDelete }: TimerProps) {
   const [timeInSec, setTimeInSec] = useState(loadSavedTime());
   const [startTime, setStartTime] = useState(loadStartTime());
   const [timerLaps, setTimerLaps] = useState(loadLaps());
+  const [pomodoroStart, setPomodoroStart] = useState(null as number | null);
 
   const resetTime = () => {
     setPaused(true);
     setTimeInSec(0);
     setTimerLaps([]);
+    setPomodoroStart(null);
     updateStartTime(null);
   };
 
@@ -57,6 +60,16 @@ export function Timer({ name, onDelete }: TimerProps) {
     localStorage.removeItem(saveKey);
     localStorage.removeItem(startTimeKey);
     localStorage.removeItem(lapsKey);
+  };
+
+  const togglePomodoroTimer = () => {
+    if (pomodoroStart == null) {
+      setPaused(false);
+      setPomodoroStart(timeInSec);
+    } else {
+      setPaused(true);
+      setPomodoroStart(null);
+    }
   };
 
   const addLap = () => {
@@ -139,6 +152,14 @@ export function Timer({ name, onDelete }: TimerProps) {
             <IoMdPlay />
           </button>
         )}
+
+        <button
+          aria-label="start pomodoro timer"
+          onClick={() => togglePomodoroTimer()}
+          className={pomodoroStart != null ? 'text-red-500' : ''}
+        >
+          <GiTomato />
+        </button>
 
         <button aria-label="lap" onClick={() => addLap()}>
           <IoMdFlag />
