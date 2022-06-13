@@ -142,7 +142,7 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   return (
     <div className="flex flex-col items-center gap-2">
-      <audio ref={soundRef} src="/assets/notification.wav" />
+      <audio ref={soundRef} src="assets/notification.wav" />
       <h2 className="font-bold text-3xl flex flex-col items-center">
         {name}
         {startTime && (
