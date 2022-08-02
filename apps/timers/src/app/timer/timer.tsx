@@ -56,7 +56,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   const timeInSec =
     seconds + minutes * 60 + hours * 60 * 60 + days * 24 * 60 * 60;
 
-  useEffect(() => reset(loadSavedTime()), []);
+  useEffect(() => reset(loadSavedTime(), false), []);
 
   const resetPomodoroTime = () => setPomodoroStart(null);
   const stopPomodoro = () => {
