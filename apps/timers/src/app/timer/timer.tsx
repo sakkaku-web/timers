@@ -23,7 +23,7 @@ const TIMER_START_KEY_PREFIX = 'sakkaku-web-timers-timerStart-';
 const TIMER_LAPS_KEY_PREFIX = 'sakkaku-web-timers-timerLaps-';
 
 // TODO: make configurable
-const POMODORO_MINUTES = 1;
+const POMODORO_MINUTES = 25;
 
 export function Timer({ name, onDelete }: TimerProps) {
   const saveKey = TIMER_KEY_PREFIX + name;
