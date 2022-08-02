@@ -109,10 +109,10 @@ export function Timer({ name, onDelete }: TimerProps) {
     [lapsKey, timerLaps]
   );
 
-  useEffect(
-    () => localStorage.setItem(saveKey, `${timeInSec}`),
-    [saveKey, timeInSec]
-  );
+  useEffect(() => {
+    localStorage.setItem(saveKey, `${timeInSec}`);
+    document.title = `${timeStr(timeInSec)} - ${name}`;
+  }, [saveKey, timeInSec]);
 
   const sendNotifiation = async (msg: string) => {
     const permission = await Notification.requestPermission();
