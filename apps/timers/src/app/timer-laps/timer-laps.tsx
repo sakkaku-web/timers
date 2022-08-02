@@ -35,6 +35,13 @@ export function TimerLaps({ laps, onChange }: TimerLapsProps) {
     }
   };
 
+  const deleteLap = () => {
+    if (editIndex != null) {
+      onChange(laps.filter((x, i) => i !== editIndex));
+      setEditIndex(null);
+    }
+  };
+
   return (
     <ul>
       {laps.map((lap, i) => (
@@ -53,7 +60,7 @@ export function TimerLaps({ laps, onChange }: TimerLapsProps) {
               <button aria-label="save" onClick={() => updateLapName()}>
                 <IoMdCheckmark />
               </button>
-              <button aria-label="cancel" onClick={() => setEditIndex(null)}>
+              <button aria-label="delete" onClick={() => deleteLap()}>
                 <IoMdClose />
               </button>
             </div>

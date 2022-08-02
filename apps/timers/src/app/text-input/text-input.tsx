@@ -27,6 +27,7 @@ export function TextInput({
       type="text"
       placeholder={placeholder}
       value={value}
+      autoFocus
       onChange={(e) => onChange && onChange(e.target.value)}
       onKeyPress={onKeyPress}
     />
