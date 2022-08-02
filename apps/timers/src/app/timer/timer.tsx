@@ -90,6 +90,13 @@ export function Timer({ name, onDelete }: TimerProps) {
   };
 
   const addLap = () => {
+    if (
+      timerLaps.length &&
+      timerLaps[timerLaps.length - 1].time === timeInSec
+    ) {
+      console.log('Lap time is zero. Ignoring');
+      return;
+    }
     setTimerLaps([...timerLaps, { name: 'Lap', time: timeInSec }]);
   };
 
