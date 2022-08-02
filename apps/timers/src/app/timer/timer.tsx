@@ -55,6 +55,8 @@ export function Timer({ name, onDelete }: TimerProps) {
     useStopwatch({});
   const timeInSec =
     seconds + minutes * 60 + hours * 60 * 60 + days * 24 * 60 * 60;
+  const elapsedPomodoroTimeInSec =
+    pomodoroStart != null ? timeInSec - pomodoroStart : null;
 
   useEffect(() => reset(loadSavedTime(), false), []);
 
@@ -111,8 +113,15 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   useEffect(() => {
     localStorage.setItem(saveKey, `${timeInSec}`);
-    document.title = `${timeStr(timeInSec)} - ${name}`;
   }, [saveKey, timeInSec]);
+
+  useEffect(() => {
+    const time =
+      elapsedPomodoroTimeInSec != null
+        ? timeStr(POMODORO_MINUTES * 60 - elapsedPomodoroTimeInSec)
+        : timeStr(timeInSec);
+    document.title = `${time} - ${name}`;
+  }, [timeInSec, elapsedPomodoroTimeInSec]);
 
   const sendNotifiation = async (msg: string) => {
     const permission = await Notification.requestPermission();
@@ -122,14 +131,14 @@ export function Timer({ name, onDelete }: TimerProps) {
     }
   };
   useEffect(() => {
-    if (pomodoroStart != null) {
-      const elapsedPomodoroMinutes = (timeInSec - pomodoroStart) / 60;
+    if (elapsedPomodoroTimeInSec != null) {
+      const elapsedPomodoroMinutes = elapsedPomodoroTimeInSec / 60;
       if (elapsedPomodoroMinutes >= POMODORO_MINUTES) {
         sendNotifiation('Take a break!');
         stopPomodoro();
       }
     }
-  }, [timeInSec, pomodoroStart, pause]);
+  }, [timeInSec, elapsedPomodoroTimeInSec, pause]);
 
   const updateStartTime = useCallback(
     (time: Date | null) => {
