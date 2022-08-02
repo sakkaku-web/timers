@@ -23,7 +23,7 @@ const TIMER_START_KEY_PREFIX = 'sakkaku-web-timers-timerStart-';
 const TIMER_LAPS_KEY_PREFIX = 'sakkaku-web-timers-timerLaps-';
 
 // TODO: make configurable
-const POMODORO_MINUTES = 25;
+const POMODORO_MINUTES = 1;
 
 export function Timer({ name, onDelete }: TimerProps) {
   const saveKey = TIMER_KEY_PREFIX + name;
@@ -52,9 +52,11 @@ export function Timer({ name, onDelete }: TimerProps) {
   const soundRef = useRef<HTMLAudioElement>(null);
 
   const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
-    useStopwatch({ offsetTimestamp: loadSavedTime() });
+    useStopwatch({});
   const timeInSec =
     seconds + minutes * 60 + hours * 60 * 60 + days * 24 * 60 * 60;
+
+  useEffect(() => reset(loadSavedTime()), []);
 
   const resetPomodoroTime = () => setPomodoroStart(null);
   const stopPomodoro = () => {
@@ -63,8 +65,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   };
 
   const resetTime = () => {
-    reset();
-    pause();
+    reset(new Date(0), false);
     setTimerLaps([]);
     resetPomodoroTime();
     updateStartTime(null);
@@ -114,7 +115,7 @@ export function Timer({ name, onDelete }: TimerProps) {
     }
   };
   useEffect(() => {
-    if (pomodoroStart) {
+    if (pomodoroStart != null) {
       const elapsedPomodoroMinutes = (timeInSec - pomodoroStart) / 60;
       if (elapsedPomodoroMinutes >= POMODORO_MINUTES) {
         sendNotifiation('Take a break!');
