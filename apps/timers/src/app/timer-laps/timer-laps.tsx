@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IoMdCheckmark, IoMdClose } from 'react-icons/io';
+import { IoMdCheckmark, IoMdTrash } from 'react-icons/io';
 import TextInput from '../text-input/text-input';
 import { timeStr } from '../utils';
 import './timer-laps.module.scss';
@@ -61,7 +61,7 @@ export function TimerLaps({ laps, onChange }: TimerLapsProps) {
                 <IoMdCheckmark />
               </button>
               <button aria-label="delete" onClick={() => deleteLap()}>
-                <IoMdClose />
+                <IoMdTrash />
               </button>
             </div>
           )) || <span onClick={() => setEditLap(i)}>{lap.name}</span>}
