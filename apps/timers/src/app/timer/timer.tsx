@@ -16,6 +16,8 @@ import { useStopwatch } from 'react-timer-hook';
 export interface TimerProps {
   name: string;
   onDelete: (name: string) => void;
+  onStateChange?: (running: boolean) => void;
+  onTime?: (elapsed: number, elapsedPomodoro: number) => void;
 }
 
 const TIMER_KEY_PREFIX = 'sakkaku-web-timers-timer-';
@@ -24,7 +26,7 @@ const TIMER_LAPS_KEY_PREFIX = 'sakkaku-web-timers-timerLaps-';
 
 const POMODORO_MINUTES = 25;
 
-export function Timer({ name, onDelete }: TimerProps) {
+export function Timer({ name, onDelete, onTime, onStateChange }: TimerProps) {
   const saveKey = TIMER_KEY_PREFIX + name;
   const startTimeKey = TIMER_START_KEY_PREFIX + name;
   const lapsKey = TIMER_LAPS_KEY_PREFIX + name;
@@ -48,6 +50,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   const [timerLaps, setTimerLaps] = useState(loadLaps());
   const [pomodoroStart, setPomodoroStart] = useState(null as number | null);
   const [pomodoroMinutes, setPomodoroMinutes] = useState(POMODORO_MINUTES);
+  const [countdownTime, setCountdownTime] = useState(POMODORO_MINUTES);
 
   const soundRef = useRef<HTMLAudioElement>(null);
 
@@ -60,11 +63,26 @@ export function Timer({ name, onDelete }: TimerProps) {
 
   useEffect(() => reset(loadSavedTime(), false), []);
 
+  const setRunningState = useCallback(
+    (setRunning: boolean) => {
+      if (setRunning) {
+        start();
+      } else {
+        pause();
+      }
+
+      if (onStateChange) {
+        onStateChange(setRunning);
+      }
+    },
+    [onStateChange, pause, start]
+  );
+
   const resetPomodoroTime = () => setPomodoroStart(null);
-  const stopPomodoro = () => {
-    pause();
+  const stopPomodoro = useCallback(() => {
+    setRunningState(false);
     resetPomodoroTime();
-  };
+  }, [setRunningState]);
 
   const resetTime = () => {
     reset(new Date(0), false);
@@ -83,8 +101,9 @@ export function Timer({ name, onDelete }: TimerProps) {
   const togglePomodoroTimer = () => {
     if (pomodoroStart == null) {
       setPomodoroStart(timeInSec);
+      setPomodoroMinutes(countdownTime);
       if (!isRunning) {
-        start();
+        setRunningState(true);
       }
     } else {
       stopPomodoro();
@@ -116,12 +135,15 @@ export function Timer({ name, onDelete }: TimerProps) {
   }, [saveKey, timeInSec]);
 
   useEffect(() => {
-    const time =
-      elapsedPomodoroTimeInSec != null
-        ? timeStr(pomodoroMinutes * 60 - elapsedPomodoroTimeInSec)
-        : timeStr(timeInSec);
-    document.title = `${time} - ${name}`;
-  }, [timeInSec, elapsedPomodoroTimeInSec]);
+    if (onTime && isRunning) {
+      onTime(
+        timeInSec,
+        elapsedPomodoroTimeInSec != null
+          ? pomodoroMinutes * 60 - elapsedPomodoroTimeInSec
+          : -1
+      );
+    }
+  }, [timeInSec, elapsedPomodoroTimeInSec, pomodoroMinutes, isRunning, onTime]);
 
   const sendNotifiation = async (msg: string) => {
     const permission = await Notification.requestPermission();
@@ -138,7 +160,13 @@ export function Timer({ name, onDelete }: TimerProps) {
         stopPomodoro();
       }
     }
-  }, [timeInSec, elapsedPomodoroTimeInSec, pause]);
+  }, [
+    timeInSec,
+    elapsedPomodoroTimeInSec,
+    pomodoroMinutes,
+    stopPomodoro,
+    pause,
+  ]);
 
   const updateStartTime = useCallback(
     (time: Date | null) => {
@@ -174,13 +202,13 @@ export function Timer({ name, onDelete }: TimerProps) {
       </div>
       <div className="flex flex-row gap-1">
         {isRunning && (
-          <button aria-label="pause" onClick={() => pause()}>
+          <button aria-label="pause" onClick={() => setRunningState(false)}>
             <IoMdPause />
           </button>
         )}
 
         {!isRunning && (
-          <button aria-label="play" onClick={() => start()}>
+          <button aria-label="play" onClick={() => setRunningState(true)}>
             <IoMdPlay />
           </button>
         )}
@@ -206,12 +234,18 @@ export function Timer({ name, onDelete }: TimerProps) {
         </button>
       </div>
 
-      <div>
+      <div className="flex flex-col gap-2 items-center">
+        {pomodoroStart != null && (
+          <span className="text-slate-500 dark:text-slate-300 text-xs text-center">
+            Running countdown {pomodoroMinutes}m
+          </span>
+        )}
         <input
-          className="rounded outline-0 ring-inset ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900"
+          className="rounded outline-0 ring-inset ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900 w-1/2"
+          placeholder="Countdown in min"
           type="number"
-          value={pomodoroMinutes}
-          onChange={(e) => setPomodoroMinutes(e.target.valueAsNumber)}
+          value={countdownTime}
+          onChange={(e) => setCountdownTime(e.target.valueAsNumber)}
         />
       </div>
     </div>
