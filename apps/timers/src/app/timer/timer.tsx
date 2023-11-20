@@ -22,7 +22,6 @@ const TIMER_KEY_PREFIX = 'sakkaku-web-timers-timer-';
 const TIMER_START_KEY_PREFIX = 'sakkaku-web-timers-timerStart-';
 const TIMER_LAPS_KEY_PREFIX = 'sakkaku-web-timers-timerLaps-';
 
-// TODO: make configurable
 const POMODORO_MINUTES = 25;
 
 export function Timer({ name, onDelete }: TimerProps) {
@@ -48,6 +47,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   const [startTime, setStartTime] = useState(loadStartTime());
   const [timerLaps, setTimerLaps] = useState(loadLaps());
   const [pomodoroStart, setPomodoroStart] = useState(null as number | null);
+  const [pomodoroMinutes, setPomodoroMinutes] = useState(POMODORO_MINUTES);
 
   const soundRef = useRef<HTMLAudioElement>(null);
 
@@ -118,7 +118,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   useEffect(() => {
     const time =
       elapsedPomodoroTimeInSec != null
-        ? timeStr(POMODORO_MINUTES * 60 - elapsedPomodoroTimeInSec)
+        ? timeStr(pomodoroMinutes * 60 - elapsedPomodoroTimeInSec)
         : timeStr(timeInSec);
     document.title = `${time} - ${name}`;
   }, [timeInSec, elapsedPomodoroTimeInSec]);
@@ -133,7 +133,7 @@ export function Timer({ name, onDelete }: TimerProps) {
   useEffect(() => {
     if (elapsedPomodoroTimeInSec != null) {
       const elapsedPomodoroMinutes = elapsedPomodoroTimeInSec / 60;
-      if (elapsedPomodoroMinutes >= POMODORO_MINUTES) {
+      if (elapsedPomodoroMinutes >= pomodoroMinutes) {
         sendNotifiation('Take a break!');
         stopPomodoro();
       }
@@ -204,6 +204,15 @@ export function Timer({ name, onDelete }: TimerProps) {
         <button aria-label="delete" onClick={() => deleteTimer()}>
           <IoMdTrash />
         </button>
+      </div>
+
+      <div>
+        <input
+          className="rounded outline-0 ring-inset ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900"
+          type="number"
+          value={pomodoroMinutes}
+          onChange={(e) => setPomodoroMinutes(e.target.valueAsNumber)}
+        />
       </div>
     </div>
   );

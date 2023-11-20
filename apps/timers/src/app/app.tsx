@@ -41,7 +41,7 @@ export function App() {
   ));
 
   return (
-    <div className="h-full flex flex-col items-center gap-4 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
+    <div className="h-full flex flex-col items-center gap-8 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
       {timerComponents}
       <div className="flex flex-row gap-1">
         <TextInput
