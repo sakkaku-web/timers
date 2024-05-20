@@ -192,7 +192,11 @@ export function Timer({
   }, [isRunning, timeInSec, updateStartTime]);
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div
+      className={`flex flex-col items-center gap-2 ${
+        !isRunning && 'text-slate-500'
+      }`}
+    >
       <audio ref={soundRef} src="assets/notification.wav" />
       <h2 className="font-bold text-3xl flex flex-col items-center">{name}</h2>
       <div className="flex flex-col items-center">
