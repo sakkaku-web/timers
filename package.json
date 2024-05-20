@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx serve",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider nx serve",
     "build": "NODE_OPTIONS=--openssl-legacy-provider nx build --prod",
     "test": "nx test"
   },

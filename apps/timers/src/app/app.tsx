@@ -6,6 +6,7 @@ import { Timer } from './timer/timer';
 import { timeStr } from './utils';
 
 const TIMERS_KEY = 'sakkaku-web-timers';
+const POMODORO_MINUTES = 25;
 
 export function App() {
   const loadSavedTimers = (): string[] => {
@@ -21,6 +22,7 @@ export function App() {
   const [timers, setTimers] = useState(loadSavedTimers());
   const [elapsedTimes, setElapsedTimes] = useState([] as number[]);
   const [currentTimeName, setCurrentTimeName] = useState('');
+  const [pomodoroMinutes, setPomodoroMinutes] = useState(POMODORO_MINUTES);
 
   const isCreateDisabled = !newTimerName || timers.includes(newTimerName);
   const addTimer = () => {
@@ -95,23 +97,33 @@ export function App() {
   ));
 
   return (
-    <div className="h-full flex flex-col items-center gap-8 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
+    <div className="h-full flex flex-wrap items-start gap-8 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
       {timerComponents}
-      <div className="flex flex-row gap-1">
-        <TextInput
-          placeholder="Name"
-          value={newTimerName}
-          onChange={setNewTimerName}
-          onEnter={addTimer}
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row gap-1">
+          <TextInput
+            placeholder="Name"
+            value={newTimerName}
+            onChange={setNewTimerName}
+            onEnter={addTimer}
+          />
+          <button
+            aria-label="add timer"
+            className="disabled:text-slate-200 dark:disabled:text-slate-700"
+            disabled={isCreateDisabled}
+            onClick={() => addTimer()}
+          >
+            <IoMdAdd />
+          </button>
+        </div>
+
+        <input
+          className="rounded outline-0 ring-inset ring-1 ring-slate-200 bg-slate-50 hover:ring-slate-400 dark:ring-slate-700 dark:bg-slate-900 w-1/2"
+          placeholder="Default Pomodoro Minutes"
+          type="number"
+          value={pomodoroMinutes}
+          onChange={(e) => setPomodoroMinutes(e.target.valueAsNumber)}
         />
-        <button
-          aria-label="add timer"
-          className="disabled:text-slate-200 dark:disabled:text-slate-700"
-          disabled={isCreateDisabled}
-          onClick={() => addTimer()}
-        >
-          <IoMdAdd />
-        </button>
       </div>
     </div>
   );
