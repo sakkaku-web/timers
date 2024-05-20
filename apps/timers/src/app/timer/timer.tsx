@@ -15,6 +15,8 @@ import { useStopwatch } from 'react-timer-hook';
 
 export interface TimerProps {
   name: string;
+  countdownTime: number;
+  showDetails: boolean;
   onDelete: (name: string) => void;
   onStateChange?: (running: boolean) => void;
   onTime?: (elapsed: number, elapsedPomodoro: number) => void;
@@ -24,9 +26,14 @@ const TIMER_KEY_PREFIX = 'sakkaku-web-timers-timer-';
 const TIMER_START_KEY_PREFIX = 'sakkaku-web-timers-timerStart-';
 const TIMER_LAPS_KEY_PREFIX = 'sakkaku-web-timers-timerLaps-';
 
-const POMODORO_MINUTES = 25;
-
-export function Timer({ name, onDelete, onTime, onStateChange }: TimerProps) {
+export function Timer({
+  name,
+  countdownTime,
+  showDetails,
+  onDelete,
+  onTime,
+  onStateChange,
+}: TimerProps) {
   const saveKey = TIMER_KEY_PREFIX + name;
   const startTimeKey = TIMER_START_KEY_PREFIX + name;
   const lapsKey = TIMER_LAPS_KEY_PREFIX + name;
@@ -49,8 +56,7 @@ export function Timer({ name, onDelete, onTime, onStateChange }: TimerProps) {
   const [startTime, setStartTime] = useState(loadStartTime());
   const [timerLaps, setTimerLaps] = useState(loadLaps());
   const [pomodoroStart, setPomodoroStart] = useState(null as number | null);
-  const [pomodoroMinutes, setPomodoroMinutes] = useState(POMODORO_MINUTES);
-  const [countdownTime, setCountdownTime] = useState(POMODORO_MINUTES);
+  const [pomodoroMinutes, setPomodoroMinutes] = useState(0);
 
   const soundRef = useRef<HTMLAudioElement>(null);
 
@@ -216,9 +222,11 @@ export function Timer({ name, onDelete, onTime, onStateChange }: TimerProps) {
 
         {startTime != null && (
           <>
-            <button aria-label="lap" onClick={() => addLap()}>
-              <IoMdFlag />
-            </button>
+            {showDetails && (
+              <button aria-label="lap" onClick={() => addLap()}>
+                <IoMdFlag />
+              </button>
+            )}
 
             <button aria-label="reset" onClick={() => resetTime()}>
               <IoMdRefresh />
@@ -240,16 +248,20 @@ export function Timer({ name, onDelete, onTime, onStateChange }: TimerProps) {
           </span>
         </div>
       )}
-      {startTime && (
-        <span className="text-xs text-slate-500 dark:text-slate-300">
-          Started at{' '}
-          <span title={startTime.toISOString()}>
-            {format(startTime, 'dd.MM.yyyy')}
-          </span>
-        </span>
-      )}
+      {showDetails && (
+        <>
+          {startTime && (
+            <span className="text-xs text-slate-500 dark:text-slate-300">
+              Started at{' '}
+              <span title={startTime.toISOString()}>
+                {format(startTime, 'dd.MM.yyyy')}
+              </span>
+            </span>
+          )}
 
-      <TimerLaps laps={timerLaps} onChange={saveLaps} />
+          <TimerLaps laps={timerLaps} onChange={saveLaps} />
+        </>
+      )}
     </div>
   );
 }

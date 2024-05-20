@@ -23,6 +23,7 @@ export function App() {
   const [elapsedTimes, setElapsedTimes] = useState([] as number[]);
   const [currentTimeName, setCurrentTimeName] = useState('');
   const [pomodoroMinutes, setPomodoroMinutes] = useState(POMODORO_MINUTES);
+  const [showDetails, setShowDetails] = useState(false);
 
   const isCreateDisabled = !newTimerName || timers.includes(newTimerName);
   const addTimer = () => {
@@ -90,6 +91,8 @@ export function App() {
     <Timer
       key={timer}
       name={timer}
+      countdownTime={pomodoroMinutes}
+      showDetails={showDetails}
       onDelete={deleteTimer}
       onStateChange={(r) => onStateChange(r, timer)}
       onTime={(e, ep) => onTime(e, ep, timer)}
@@ -97,7 +100,7 @@ export function App() {
   ));
 
   return (
-    <div className="h-full flex flex-wrap items-start gap-8 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
+    <div className="h-full flex flex-wrap items-start gap-12 p-4 text-slate-900 bg-slate-50 dark:bg-slate-900 dark:text-slate-50">
       {timerComponents}
       <div className="flex flex-col gap-2">
         <div className="flex flex-row gap-1">
@@ -124,6 +127,15 @@ export function App() {
           value={pomodoroMinutes}
           onChange={(e) => setPomodoroMinutes(e.target.valueAsNumber)}
         />
+
+        <div className='flex gap-2 items-center'>
+          <input
+            type="checkbox"
+            checked={showDetails}
+            onChange={(e) => setShowDetails(e.target.checked)}
+          />
+          <label>Detailed Tracking</label>
+        </div>
       </div>
     </div>
   );
